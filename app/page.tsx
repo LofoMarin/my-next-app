@@ -65,12 +65,12 @@ export default function Component() {
                 placeholder="Ingrese su expresión de autómata finito"
                 value={expression}
                 onChange={(e) => setExpression(e.target.value)}
-                className="w-full pl-4 pr-12 py-3 bg-gray-50 text-gray-800 placeholder-gray-400 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
+                className="w-[790px] pl-4 pr-12 py-3 bg-gray-50 text-gray-800 placeholder-gray-400 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
               />
               <Button
                 type="submit"
                 size="icon"
-                className="absolute right-1 top-1 bg-gray-200 hover:bg-gray-300"
+                className="absolute right-2 top-1/2 ransform -translate-y-1/2 bg-gray-200 hover:bg-gray-300"
               >
                 <Send className="h-4 w-4 text-gray-600" />
                 <span className="sr-only">Enviar</span>
