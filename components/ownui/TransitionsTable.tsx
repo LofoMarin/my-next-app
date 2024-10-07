@@ -22,10 +22,27 @@ export default function TransitionTable({ transitions }: TransitionTableProps) {
   const renderToCell = (to: Map<string, number | Set<number>>) => {
     return Array.from(to.entries()).map(([symbol, target], index) => (
       <div key={index}>
-        {symbol} →{" "}
-        {target instanceof Set ? Array.from(target).join(", ") : target}
+        {symbol} → {target instanceof Set ? Array.from(target).join(', ') : target}
       </div>
     ));
+  };
+
+  const renderFromCell = (transition: Transition) => {
+    let init = '';
+    let accept = '';
+    
+    if (transition.start) {
+      init = '→';
+    }
+    if (transition.accepting) {
+      accept = ' *';
+    }
+
+    return (
+      <span>
+        {init}{accept}{transition.from}
+      </span>
+    );
   };
 
   return (
@@ -38,14 +55,9 @@ export default function TransitionTable({ transitions }: TransitionTableProps) {
       </thead>
       <tbody>
         {Array.from(transitions).map((transition, index) => (
-          <tr
-            key={index}
-            className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-          >
-            <td className="py-2 px-4 border-b">{transition.from}</td>
-            <td className="py-2 px-4 border-b">
-              {renderToCell(transition.to)}
-            </td>
+          <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+            <td className="py-2 px-4 border-b">{renderFromCell(transition)}</td>
+            <td className="py-2 px-4 border-b">{renderToCell(transition.to)}</td>
           </tr>
         ))}
       </tbody>

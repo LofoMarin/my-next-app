@@ -31,18 +31,32 @@ export function move(states: Set<NFANode>, symbol: string): Set<NFANode> {
 }
 
 export function getSymbols(regex: string): Set<string> {
-  const excludedChars = /[()|+*?]/g;
+  // Define the special characters to exclude
+  const specialChars = new Set(['&', '(', ')', '*', '+', '|']);
+  
+  // Use a Set to store unique symbols
+  const symbols = new Set<string>();
 
-  const set = new Set<string>();
+  // Iterate through each character in the regex
+  for (let i = 0; i < regex.length; i++) {
+    const char = regex[i];
 
-  for (const char of regex) {
-    // If the character is not in the excluded list, add it to the set
-    if (!excludedChars.test(char)) {
-      set.add(char);
+    // Skip special characters
+    if (specialChars.has(char)) {
+      continue;
+    }
+
+    // Handle escaped characters
+    if (char === '\\' && i + 1 < regex.length) {
+      const nextChar = regex[i + 1];
+      symbols.add('\\' + nextChar);
+      i++; // Skip the next character as it's part of the escape sequence
+    } else {
+      symbols.add(char);
     }
   }
 
-  return set;
+  return symbols;
 }
 
 export function createTransitionTable(initialNode: NFANode): Set<TransitionT> {

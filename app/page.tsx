@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronRight, Send, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import avsdf from "cytoscape-avsdf";
 import { createAutomaton, AutomatonType, Automaton } from "@/backend";
 import { RecognitionResult } from "@/backend/utils";
 import TransitionTable from "@/components/ownui/TransitionsTable";
+import StateTable from "@/components/ownui/StatesTable";
+import EqualTable from "@/components/ownui/EqualsTable";
 
 cytoscape.use(avsdf);
 
@@ -76,13 +78,19 @@ export default function Component() {
   const [automata, setAutomata] = useState<Automaton | null>(null);
   const [testString, setTestString] = useState("");
   const [testResult, setTestResult] = useState<RecognitionResult | null>(null);
-
-  const [showHistory, setShowHistory] = useState(false);
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [routePath, setRoutePath] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
+
+  const cyRef = useRef(null);
+
+  useEffect(() => {
+    if (cyRef.current && automata) {
+      const cy = cyRef.current;
+      cy.elements().remove();
+      cy.add(automata.cytoscape_data);
+      cy.layout(cts_layout).run();
+      cy.fit();
+    }
+  }, [automata]);
 
   const handleButtonClick = (buttonType: string) => {
     setSelectedButton(buttonType);
@@ -99,7 +107,6 @@ export default function Component() {
         expression
       );
       setAutomata(automaton);
-      console.log(automaton.cytoscape_data);
     } catch (err: Error) {
       console.log(err);
     }
@@ -181,9 +188,43 @@ export default function Component() {
           </div>
 
           {automata && (
-            <>
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <ChevronRight className="mr-2" />
+                Simbolos
+              </h3>
+              <p>{Array.from(automata.symbols).join(", ")}</p>
+            </div>
+          )}
+
+          {automata && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <ChevronRight className="mr-2" />
+                Tabla de transiciones
+              </h3>
               <TransitionTable transitions={automata.transitions} />
-            </>
+            </div>
+          )}
+
+          {automata && automata.states && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <ChevronRight className="mr-2" />
+                Tabla de estados
+              </h3>
+              <StateTable states={automata.states} type={automata.type} />
+            </div>
+          )}
+
+          {automata && automata.equals && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <ChevronRight className="mr-2" />
+                Tabla de identicos
+              </h3>
+              <EqualTable equalSet={automata.equals} />
+            </div>
           )}
 
           <motion.div
@@ -200,12 +241,14 @@ export default function Component() {
                 </h3>
                 <div className="p-5 m-5 w-full h-[400px]">
                   <CytoscapeComponent
+                    cy={(cy) => (cyRef.current = cy)}
                     elements={CytoscapeComponent.normalizeElements(
                       automata.cytoscape_data
                     )}
                     style={{ width: "100%", height: "100%" }}
                     layout={cts_layout}
                     stylesheet={cts_styles}
+                    wheelSensitivity={0.1}
                   />
                   <p className="text-sm">
                     <span className="font-bold">Nota: </span>El nodo en rosa es
@@ -216,7 +259,6 @@ export default function Component() {
             )}
           </motion.div>
 
-            
           <form onSubmit={handleTest} className="flex items-center mb-6">
             <Input
               type="text"
@@ -227,9 +269,9 @@ export default function Component() {
             />
             <Button
               type="submit"
-              className="ml-2 bg-gray-200 hover:bg-gray-300"
+              className="ml-2 bg-gray-200 hover:bg-gray-300 text-black"
             >
-              Enviar
+              Probar
             </Button>
             <div
               className={`ml-4 w-4 h-4 rounded-full ${

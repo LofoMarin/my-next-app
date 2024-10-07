@@ -64,14 +64,20 @@ export function buildDFA(regex: string): DFA {
         existingTransition.accepting = isAccepting; // Update accepting property
       }
     } else {
-      if (symbol && to !== undefined) {
-        transitionSet.add({
-          from,
-          to: new Map<string, number>([[symbol, to]]),
-          start: isStart, // Set start property
-          accepting: isAccepting, // Set accepting property
-        });
+      // Create a new transition
+      const newTransition = {
+        from,
+        to: new Map<string, number>(),
+        start: isStart, // Set start property
+        accepting: isAccepting, // Set accepting property
+      };
+
+      // Only set the symbol and to if they are defined
+      if (symbol !== undefined && to !== undefined) {
+        newTransition.to.set(symbol, to);
       }
+
+      transitionSet.add(newTransition);
     }
   };
 

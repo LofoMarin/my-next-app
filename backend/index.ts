@@ -12,6 +12,7 @@ import {
 export type AutomatonType = "nfa" | "dfa" | "odfa";
 
 export interface Automaton {
+  type: AutomatonType;
   symbols: Set<string>;
   transitions: Set<TransitionT | TransitionD>;
   states?: Set<State>;
@@ -25,6 +26,7 @@ export function createAutomaton(type: AutomatonType, regex: string): Automaton {
     case "nfa":
       const nfa: NFA = buildNFA(regex);
       return {
+        type: "nfa",
         symbols: getSymbols(regex),
         transitions: nfa.transitions,
         cytoscape_data: generateCytoscapeData(nfa.transitions),
@@ -32,6 +34,7 @@ export function createAutomaton(type: AutomatonType, regex: string): Automaton {
     case "dfa":
       const dfa: DFA = buildDFA(regex);
       return {
+        type: "dfa",
         symbols: getSymbols(regex),
         transitions: dfa.transitions,
         states: dfa.states,
@@ -42,6 +45,7 @@ export function createAutomaton(type: AutomatonType, regex: string): Automaton {
     case "odfa":
       const odfa: ODFA = buildODFA(regex);
       return {
+        type: "odfa",
         symbols: getSymbols(regex),
         transitions: odfa.transitions,
         states: odfa.states,
