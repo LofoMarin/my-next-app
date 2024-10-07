@@ -2,11 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Send, Clock, X } from "lucide-react";
+import { ChevronRight, Send} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
 import avsdf from "cytoscape-avsdf";
